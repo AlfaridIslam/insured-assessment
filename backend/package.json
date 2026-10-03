@@ -1,0 +1,45 @@
+{
+  "name": "insuredmine-assessment",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "InsuredMine Backend Assessment - Policy Management, CSV Worker Threads, Scheduled Message Queue, and Real-time CPU Monitor",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --runInBand"
+  },
+  "keywords": [
+    "express",
+    "mongodb",
+    "mongoose",
+    "redis",
+    "bullmq",
+    "socket.io",
+    "worker-threads",
+    "csv-parser"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bullmq": "^5.8.0",
+    "cors": "^2.8.5",
+    "csv-parser": "^3.0.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "ioredis": "^5.4.1",
+    "joi": "^18.2.9",
+    "mongoose": "^8.4.0",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "pidusage": "^3.0.2",
+    "socket.io": "^4.7.5",
+    "swagger-jsdoc": "^6.3.0",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.2",
+    "supertest": "^7.0.0"
+  }
+}

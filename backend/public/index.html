@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>InsuredMine API Tester</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8 font-sans">
+  <div class="max-w-4xl mx-auto space-y-8">
+    <h1 class="text-3xl font-bold text-gray-800">InsuredMine API Tester</h1>
+
+    <!-- Task 1: Upload CSV -->
+    <div class="bg-white p-6 rounded-lg shadow">
+      <h2 class="text-xl font-semibold mb-4">1. Upload CSV (Worker Thread)</h2>
+      <input type="file" id="csvFile" accept=".csv" class="mb-4 block">
+      <button onclick="uploadCSV()" class="bg-blue-600 text-white px-4 py-2 rounded">Upload & Process</button>
+      <p id="uploadStatus" class="mt-2 text-sm text-gray-600"></p>
+    </div>
+
+    <!-- Task 1.2: Search Policies -->
+    <div class="bg-white p-6 rounded-lg shadow">
+      <h2 class="text-xl font-semibold mb-4">2. Search User Policies</h2>
+      <div class="flex gap-4">
+        <input type="text" id="searchInput" placeholder="Enter first name..." class="border p-2 rounded w-full">
+        <button onclick="searchPolicies()" class="bg-green-600 text-white px-4 py-2 rounded">Search</button>
+      </div>
+      <pre id="searchResults" class="mt-4 bg-gray-50 p-4 rounded text-sm overflow-x-auto"></pre>
+    </div>
+
+    <!-- Task 2: Schedule Message -->
+    <div class="bg-white p-6 rounded-lg shadow">
+      <h2 class="text-xl font-semibold mb-4">3. Schedule Message (BullMQ)</h2>
+      <div class="space-y-4">
+        <textarea id="msgText" placeholder="Enter message..." class="border p-2 rounded w-full"></textarea>
+        <div class="flex gap-4">
+          <input type="date" id="msgDate" class="border p-2 rounded w-full">
+          <input type="time" id="msgTime" class="border p-2 rounded w-full">
+        </div>
+        <button onclick="scheduleMessage()" class="bg-purple-600 text-white px-4 py-2 rounded">Schedule Job</button>
+        <p id="scheduleStatus" class="mt-2 text-sm text-gray-600"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:5000/api';
+
+    async function uploadCSV() {
+      const fileInput = document.getElementById('csvFile');
+      const status = document.getElementById('uploadStatus');
+      
+      if (!fileInput.files[0]) return status.innerText = 'Please select a file.';
+      
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+
+      status.innerText = 'Uploading...';
+      try {
+        const res = await fetch(`${API_BASE}/upload`, { method: 'POST', body: formData });
+        const data = await res.json();
+        status.innerText = data.message;
+      } catch (err) {
+        status.innerText = 'Upload failed. Check console.';
+      }
+    }
+
+    async function searchPolicies() {
+      const query = document.getElementById('searchInput').value;
+      const results = document.getElementById('searchResults');
+      
+      if (!query) return;
+      
+      results.innerText = 'Searching...';
+      try {
+        const res = await fetch(`${API_BASE}/search?username=${query}`);
+        const data = await res.json();
+        results.innerText = JSON.stringify(data, null, 2);
+      } catch (err) {
+        results.innerText = 'Search failed.';
+      }
+    }
+
+    async function scheduleMessage() {
+      const message = document.getElementById('msgText').value;
+      const day = document.getElementById('msgDate').value;
+      const time = document.getElementById('msgTime').value;
+      const status = document.getElementById('scheduleStatus');
+
+      if (!message || !day || !time) return status.innerText = 'Fill all fields.';
+
+      status.innerText = 'Scheduling...';
+      try {
+        const res = await fetch(`${API_BASE}/messages/schedule`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message, day, time })
+        });
+        const data = await res.json();
+        status.innerText = data.message || JSON.stringify(data.errors);
+      } catch (err) {
+        status.innerText = 'Scheduling failed.';
+      }
+    }
+  </script>
+</body>
+</html>
